@@ -1,0 +1,207 @@
+: Saved
+
+: 
+: Serial Number: JAD250607Z9
+: Hardware:   ASA5506, 4096 MB RAM, CPU Atom C2000 series 1250 MHz, 1 CPU (4 cores)
+: Written by enable_15 at 13:11:01.312 UTC Mon Mar 11 2024
+!
+ASA Version 9.12(1)2 
+!
+hostname DC-FW
+enable password $sha512$5000$xOaeA+i4GYMZRcYYccYaVw==$toqMsHQFhrfxky50c0f/rA== pbkdf2
+names
+no mac-address auto
+zone outside
+zone inside
+
+!
+interface GigabitEthernet1/1
+ nameif outside_1
+ security-level 0
+ zone-member outside
+ ip address 10.0.203.2 255.255.255.252 
+ ipv6 enable
+ ospf message-digest-key 1 md5 Passw0rd!
+ ipv6 ospf 1 area 0
+!
+interface GigabitEthernet1/2
+ nameif outside_2
+ security-level 0
+ zone-member outside
+ ip address 10.0.203.6 255.255.255.252 
+ ipv6 enable
+ ospf message-digest-key 1 md5 Passw0rd!
+ ipv6 ospf 1 area 0
+!
+interface GigabitEthernet1/3
+ nameif inside_1
+ security-level 100
+ zone-member inside
+ ip address 10.0.200.1 255.255.255.252 
+ ipv6 address fe80::def link-local
+ ipv6 address 2a14:7001:1111:1131::3/64
+ ospf message-digest-key 1 md5 Passw0rd!
+ ipv6 ospf 1 area 0
+!
+interface GigabitEthernet1/4
+ nameif inside_2
+ security-level 100
+ zone-member inside
+ ip address 10.0.200.5 255.255.255.252 
+ ipv6 address fe80::def link-local
+ ipv6 address 2a14:7001:1111:1132::3/64
+ ospf message-digest-key 1 md5 Passw0rd!
+ ipv6 ospf 1 area 0
+!
+interface GigabitEthernet1/5
+ nameif dmz
+ security-level 50
+ ip address 10.0.30.2 255.255.255.252 
+ ipv6 address 2a14:7001:1234:1234::def/64
+ ipv6 enable
+ ipv6 ospf 1 area 0
+!
+interface GigabitEthernet1/6
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet1/7
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet1/8
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface Management1/1
+ management-only
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+ftp mode passive
+same-security-traffic permit inter-interface
+same-security-traffic permit intra-interface
+access-list OUTSIDE extended permit ip 10.0.0.0 255.0.0.0 10.0.10.0 255.255.255.248 
+access-list OUTSIDE extended permit ip any 10.0.20.0 255.255.255.0 
+access-list OUTSIDE extended permit ip any 10.0.30.0 255.255.255.252 
+access-list OUTSIDE extended permit ip 2a09:f8c0:1::/48 2a14:7001:2648:2648::/64 
+access-list OUTSIDE extended permit ip 2a0b:fac0:101::/48 2a14:7001:2648:2648::/64 
+access-list OUTSIDE extended permit ip any 2a14:7001:1234:1234::/64 
+access-list OUTSIDE extended permit ip any 2a14:7000:9999:9999::/64 
+pager lines 24
+mtu outside_1 1500
+mtu outside_2 1500
+mtu inside_1 1500
+mtu inside_2 1500
+mtu dmz 1500
+icmp unreachable rate-limit 1 burst-size 1
+no asdm history enable
+arp timeout 14400
+no arp permit-nonconnected
+arp rate-limit 16384
+access-group OUTSIDE in interface outside_1
+access-group OUTSIDE in interface outside_2
+ipv6 router ospf 1
+ router-id 0.2.1.1
+ log-adjacency-changes
+!
+router ospf 1
+ router-id 0.2.1.1
+ network 10.0.30.0 255.255.255.252 area 0
+ network 10.0.200.0 255.255.255.252 area 0
+ network 10.0.200.4 255.255.255.252 area 0
+ network 10.0.203.0 255.255.255.252 area 0
+ network 10.0.203.4 255.255.255.252 area 0
+ area 0 authentication message-digest
+ log-adj-changes
+!
+timeout xlate 3:00:00
+timeout pat-xlate 0:00:30
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 sctp 0:02:00 icmp 0:00:02
+timeout sunrpc 0:10:00 h323 0:05:00 h225 1:00:00 mgcp 0:05:00 mgcp-pat 0:05:00
+timeout sip 0:30:00 sip_media 0:02:00 sip-invite 0:03:00 sip-disconnect 0:02:00
+timeout sip-provisional-media 0:02:00 uauth 0:05:00 absolute
+timeout tcp-proxy-reassembly 0:01:00
+timeout floating-conn 0:00:00
+timeout conn-holddown 0:00:15
+timeout igp stale-route 0:01:10
+user-identity default-domain LOCAL
+aaa authentication login-history
+no snmp-server location
+no snmp-server contact
+service sw-reset-button
+crypto ipsec security-association pmtu-aging infinite
+crypto ca trustpool policy
+telnet timeout 5
+ssh stricthostkeycheck
+ssh timeout 5
+console timeout 0
+
+threat-detection basic-threat
+threat-detection statistics access-list
+no threat-detection statistics tcp-intercept
+ntp server 136.92.3.1
+dynamic-access-policy-record DfltAccessPolicy
+!
+class-map inspection_default
+ match default-inspection-traffic
+!
+!
+policy-map type inspect dns preset_dns_map
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+policy-map global_policy
+ class inspection_default
+  inspect ftp 
+  inspect h323 h225 
+  inspect h323 ras 
+  inspect ip-options 
+  inspect netbios 
+  inspect rsh 
+  inspect rtsp 
+  inspect skinny  
+  inspect esmtp 
+  inspect sqlnet 
+  inspect sunrpc 
+  inspect tftp 
+  inspect sip  
+  inspect xdmcp 
+  inspect dns preset_dns_map 
+  inspect icmp 
+policy-map type inspect dns migrated_dns_map_2
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+policy-map type inspect dns migrated_dns_map_1
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+!
+service-policy global_policy global
+prompt hostname context 
+no call-home reporting anonymous
+call-home
+ profile CiscoTAC-1
+  no active
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination address email callhome@cisco.com
+  destination transport-method http
+  subscribe-to-alert-group diagnostic
+  subscribe-to-alert-group environment
+  subscribe-to-alert-group inventory periodic monthly
+  subscribe-to-alert-group configuration periodic monthly
+  subscribe-to-alert-group telemetry periodic daily
+Cryptochecksum:af5fd4daa2de1f1bc45e792eea435ecb
+: end

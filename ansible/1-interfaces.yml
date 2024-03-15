@@ -1,0 +1,122 @@
+---
+- name: Create VLANs
+  hosts: all_devices
+  tasks:
+    - name: Create VLANs
+      cisco.ios.ios_vlans:
+        config:
+          - name: "{{ item['name'] }}"
+            vlan_id: "{{ item['id'] }}"
+            state: active
+            shutdown: disabled
+      loop: "{{ hostvars[inventory_hostname]['vlans'] }}"
+
+- name: Set IOS interface basics
+  hosts: all_devices
+  tasks:
+    - name: Set interface description if defined
+      cisco.ios.ios_interfaces:
+        config:
+          - name: "{{ item['name'] }}"
+            description: "{{ item['description'] }}"
+      loop: "{{ hostvars[inventory_hostname]['interfaces'] }}"
+      when: "item['description'] is defined"
+
+    - name: Set interface mode if defined
+      cisco.ios.ios_interfaces:
+        config:
+          - name: "{{ item['name'] }}"
+            mode: "{{ item['mode'] }}"
+      loop: "{{ hostvars[inventory_hostname]['interfaces'] }}"
+      when: "item['mode'] is defined"
+
+    # - name: Set trunk encapsulation
+    #   cisco.ios.ios_l2_interfaces:
+    #     config:
+    #       - name: "{{ item['name'] }}"
+    #         trunk:
+    #           encapsulation: dot1q
+    #   loop: "{{ hostvars[inventory_hostname]['interfaces'] }}"
+    #   when: "item['mode'] == 'layer2' and item['sw_mode'] == 'trunk'"
+
+    - name: Set up L2 Trunk interfaces
+      cisco.ios.ios_l2_interfaces:
+        config:
+          - name: "{{ item['name'] }}"
+            trunk:
+              allowed_vlans: "{{ item['allowed_vlans'] }}"
+            mode: trunk
+      loop: "{{ hostvars[inventory_hostname]['interfaces'] }}"
+      when: "item['mode'] is defined and item['mode'] == 'layer2' and item['sw_mode'] == 'trunk'"
+
+    - name: Set up L2 Access interface
+      cisco.ios.ios_l2_interfaces:
+        config:
+          - name: "{{ item['name'] }}"
+            access:
+              vlan: "{{ item['vlan_id'] }}"
+            mode: access
+      loop: "{{ hostvars[inventory_hostname]['interfaces'] }}"
+      when: "item['mode'] is defined and item['mode'] == 'layer2' and item['sw_mode'] == 'access'"
+
+    - name: Set up L3 v4 interfaces
+      cisco.ios.ios_l3_interfaces:
+        config:
+          - name: "{{ item['name'] }}"
+            ipv4:
+              - address: "{{ item['address']['v4'] }}"
+      loop: "{{ hostvars[inventory_hostname]['interfaces'] }}"
+      when: "item['address'] is defined and item['address']['v4'] is defined"
+
+    - name: Set up L3 v6 LLA interfaces
+      cisco.ios.ios_l3_interfaces:
+        config:
+          - name: "{{ item['name'] }}"
+            ipv6:
+              - link_local: true
+                eui: true
+      loop: "{{ hostvars[inventory_hostname]['interfaces'] }}"
+      when: "item['address'] is defined and item['address']['v6'] is defined and item['address']['v6'] == 'LLA'"
+
+    - name: Set up L3 v6 GUA interfaces
+      cisco.ios.ios_l3_interfaces:
+        config:
+          - name: "{{ item['name'] }}"
+            ipv6:
+              - address: "{{ item['address']['v6'] }}"
+      loop: "{{ hostvars[inventory_hostname]['interfaces'] }}"
+      when: "item['address'] is defined and item['address']['v6'] is defined and item['address']['v6'] != 'LLA'"
+
+    - name: Enable IPv4 Routing
+      cisco.ios.ios_config:
+        lines:
+          - "ip routing"
+      when: "hostvars[inventory_hostname]['routing']['v4']"
+
+    - name: Enable IPv6 Routing
+      cisco.ios.ios_config:
+        lines:
+          - "ipv6 unicast-routing"
+      when: "hostvars[inventory_hostname]['routing']['v6']"
+
+    - name: Launch OSPFv2 Process
+      cisco.ios.ios_ospfv2:
+        config:
+          processes:
+            - process_id: "{{ hostvars[inventory_hostname]['routing']['ospf_pid'] }}"
+              router_id: "{{ hostvars[inventory_hostname]['ospf_routerid'] }}"
+              areas:
+                - area_id: "{{ hostvars[inventory_hostname]['routing']['ospf_area'] }}"
+      when: "hostvars[inventory_hostname]['routing']['v4']"
+
+    - name: Launch OSPFv3 Process
+      cisco.ios.ios_ospfv3:
+        config:
+          processes:
+            - process_id: "{{ hostvars[inventory_hostname]['routing']['ospf_pid'] }}"
+              router_id: "{{ hostvars[inventory_hostname]['ospf_routerid'] }}"
+              address_family:
+                - afi: ipv6
+              areas:
+                - area_id: "{{ hostvars[inventory_hostname]['routing']['ospf_area'] }}"
+      when: "hostvars[inventory_hostname]['routing']['v6']"

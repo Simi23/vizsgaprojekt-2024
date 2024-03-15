@@ -1,0 +1,465 @@
+
+!
+! Last configuration change at 08:53:53 CET Mon Mar 11 2024
+! NVRAM config last updated at 14:09:36 CET Mon Mar 11 2024 by itadmin
+!
+version 16.12
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service call-home
+platform punt-keepalive disable-kernel-core
+platform management port rate-limt-enabled
+!
+hostname DC-DIST-1
+!
+!
+vrf definition Mgmt-vrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+aaa new-model
+!
+!
+aaa group server radius WIN-RAD
+ server name WIN
+!
+aaa authentication login default group WIN-RAD local
+aaa authorization exec default group WIN-RAD local 
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone CET 1 0
+clock summer-time CEST recurring last Sun Mar 2:00 last Sun Oct 3:00
+switch 1 provision ws-c3850-12x48u
+!
+!
+!
+!
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+  no destination transport-method email
+ip routing
+!
+!
+!
+!
+!
+no ip domain lookup
+ip domain name mak.vasut
+!
+!
+!
+login on-success log
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+no device-tracking logging theft
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+crypto pki trustpoint TP-self-signed-1893237898
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1893237898
+ revocation-check none
+ rsakeypair TP-self-signed-1893237898
+!
+!
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01 nvram:CiscoLicensi#1CA.cer
+crypto pki certificate chain TP-self-signed-1893237898
+ certificate self-signed 01 nvram:IOS-Self-Sig#A.cer
+!
+!
+license boot level ipservicesk9
+!
+!
+diagnostic bootup level minimal
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+spanning-tree vlan 10,20,199 priority 24576
+memory free low-watermark processor 79468
+!
+username localuser privilege 15 secret 9 $9$11fauO81BoZkmk$Lnr5109G0rBgVADoeyWmKh.CAc1izyrkT/qzcAMP8bo
+!
+redundancy
+ mode sso
+!
+!
+!
+!
+!
+transceiver type all
+ monitoring
+!
+track 4 ip sla 4 reachability
+!
+track 6 ip sla 6 reachability
+!
+!
+class-map match-any system-cpp-police-topology-control
+  description Topology control
+class-map match-any system-cpp-police-sw-forward
+  description Sw forwarding, L2 LVX data, LOGGING
+class-map match-any system-cpp-default
+  description EWLC control, EWLC data, Inter FED 
+class-map match-any system-cpp-police-sys-data
+  description Learning cache ovfl, High Rate App, Exception, EGR Exception, NFL SAMPLED DATA, RPF Failed
+class-map match-any system-cpp-police-punt-webauth
+  description Punt Webauth
+class-map match-any system-cpp-police-l2lvx-control
+  description L2 LVX control packets
+class-map match-any system-cpp-police-forus
+  description Forus Address resolution and Forus traffic
+class-map match-any system-cpp-police-multicast-end-station
+  description MCAST END STATION
+class-map match-any system-cpp-police-multicast
+  description Transit Traffic and MCAST Data
+class-map match-any system-cpp-police-l2-control
+  description L2 control
+class-map match-any system-cpp-police-dot1x-auth
+  description DOT1X Auth
+class-map match-any system-cpp-police-data
+  description ICMP redirect, ICMP_GEN and BROADCAST
+class-map match-any system-cpp-police-stackwise-virt-control
+  description Stackwise Virtual
+class-map match-any non-client-nrt-class
+class-map match-any system-cpp-police-routing-control
+  description Routing control and Low Latency
+class-map match-any system-cpp-police-protocol-snooping
+  description Protocol snooping
+class-map match-any system-cpp-police-dhcp-snooping
+  description DHCP snooping
+class-map match-any system-cpp-police-system-critical
+  description System Critical and Gold Pkt
+!
+policy-map system-cpp-policy
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.0.222.1 255.255.255.255
+ ip ospf 1 area 0
+ ipv6 address 2A14:7001:1111:1141::1/64
+ ipv6 ospf 1 area 0
+!
+interface Port-channel1
+ description **DC-DIST-2**
+ no switchport
+ ip address 10.0.201.1 255.255.255.252
+ ip ospf message-digest-key 1 md5 Passw0rd!
+ ip ospf 1 area 0
+ ipv6 enable
+ ipv6 ospf 1 area 0
+!
+interface GigabitEthernet0/0
+ vrf forwarding Mgmt-vrf
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet1/0/1
+!
+interface GigabitEthernet1/0/2
+!
+interface GigabitEthernet1/0/3
+!
+interface GigabitEthernet1/0/4
+!
+interface GigabitEthernet1/0/5
+!
+interface GigabitEthernet1/0/6
+!
+interface GigabitEthernet1/0/7
+!
+interface GigabitEthernet1/0/8
+!
+interface GigabitEthernet1/0/9
+!
+interface GigabitEthernet1/0/10
+!
+interface GigabitEthernet1/0/11
+!
+interface GigabitEthernet1/0/12
+!
+interface GigabitEthernet1/0/13
+!
+interface GigabitEthernet1/0/14
+!
+interface GigabitEthernet1/0/15
+!
+interface GigabitEthernet1/0/16
+!
+interface GigabitEthernet1/0/17
+!
+interface GigabitEthernet1/0/18
+!
+interface GigabitEthernet1/0/19
+!
+interface GigabitEthernet1/0/20
+!
+interface GigabitEthernet1/0/21
+!
+interface GigabitEthernet1/0/22
+!
+interface GigabitEthernet1/0/23
+!
+interface GigabitEthernet1/0/24
+!
+interface GigabitEthernet1/0/25
+!
+interface GigabitEthernet1/0/26
+!
+interface GigabitEthernet1/0/27
+!
+interface GigabitEthernet1/0/28
+!
+interface GigabitEthernet1/0/29
+!
+interface GigabitEthernet1/0/30
+!
+interface GigabitEthernet1/0/31
+!
+interface GigabitEthernet1/0/32
+!
+interface GigabitEthernet1/0/33
+!
+interface GigabitEthernet1/0/34
+!
+interface GigabitEthernet1/0/35
+!
+interface GigabitEthernet1/0/36
+!
+interface TenGigabitEthernet1/0/37
+ description **DC-ACC-1**
+ switchport trunk allowed vlan 10,199
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/38
+ description **DC-ACC-2**
+ switchport trunk allowed vlan 20,199
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/39
+ description **DC-ACC-3**
+ switchport trunk allowed vlan 199
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/40
+!
+interface TenGigabitEthernet1/0/41
+!
+interface TenGigabitEthernet1/0/42
+!
+interface TenGigabitEthernet1/0/43
+!
+interface TenGigabitEthernet1/0/44
+!
+interface TenGigabitEthernet1/0/45
+!
+interface TenGigabitEthernet1/0/46
+!
+interface TenGigabitEthernet1/0/47
+!
+interface TenGigabitEthernet1/0/48
+ description **DC-FW**
+ no switchport
+ ip address 10.0.200.2 255.255.255.252
+ ip ospf message-digest-key 1 md5 Passw0rd!
+ ip ospf 1 area 0
+ ipv6 enable
+ ipv6 ospf 1 area 0
+!
+interface GigabitEthernet1/1/1
+!
+interface GigabitEthernet1/1/2
+!
+interface GigabitEthernet1/1/3
+!
+interface GigabitEthernet1/1/4
+!
+interface TenGigabitEthernet1/1/1
+ no switchport
+ no ip address
+ channel-protocol lacp
+ channel-group 1 mode active
+!
+interface TenGigabitEthernet1/1/2
+ no switchport
+ no ip address
+ channel-protocol lacp
+ channel-group 1 mode active
+!
+interface TenGigabitEthernet1/1/3
+!
+interface TenGigabitEthernet1/1/4
+!
+interface TenGigabitEthernet1/1/5
+!
+interface TenGigabitEthernet1/1/6
+!
+interface TenGigabitEthernet1/1/7
+!
+interface TenGigabitEthernet1/1/8
+!
+interface FortyGigabitEthernet1/1/1
+!
+interface FortyGigabitEthernet1/1/2
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan10
+ ip address 10.0.10.4 255.255.255.248
+ ip ospf 1 area 0
+ ipv6 address 2A14:7001:2648:2648::DEF1/64
+ ipv6 enable
+ ipv6 ospf 1 area 0
+ glbp 4 ip 10.0.10.6
+ glbp 4 priority 150
+ glbp 4 preempt
+ glbp 4 weighting 100 lower 90
+ glbp 4 authentication md5 key-string Passw0rd!
+ glbp 4 weighting track 4 decrement 20
+ glbp 6 ipv6 FE80::DEF
+ glbp 6 priority 150
+ glbp 6 preempt
+ glbp 6 weighting 100 lower 90
+ glbp 6 authentication md5 key-string Passw0rd!
+ glbp 6 weighting track 6 decrement 20
+!
+interface Vlan20
+ ip address 10.0.20.252 255.255.255.0
+ ip ospf 1 area 0
+ ipv6 address 2A14:7000:9999:9999::DEF1/64
+ ipv6 enable
+ ipv6 ospf 1 area 0
+ glbp 4 ip 10.0.20.254
+ glbp 4 priority 150
+ glbp 4 preempt
+ glbp 4 weighting 100 lower 90
+ glbp 4 authentication md5 key-string Passw0rd!
+ glbp 4 weighting track 4 decrement 20
+ glbp 6 ipv6 FE80::DEF
+ glbp 6 priority 150
+ glbp 6 preempt
+ glbp 6 weighting 100 lower 90
+ glbp 6 authentication md5 key-string Passw0rd!
+ glbp 6 weighting track 6 decrement 20
+!
+interface Vlan199
+ ip address 10.0.199.252 255.255.255.0
+ ip helper-address 10.0.10.1
+ ip ospf 1 area 0
+ ipv6 address 2A14:7000:0:199::DEF1/64
+ ipv6 enable
+ ipv6 ospf 1 area 0
+ glbp 4 ip 10.0.199.254
+ glbp 4 priority 150
+ glbp 4 preempt
+ glbp 4 weighting 100 lower 90
+ glbp 4 authentication md5 key-string Passw0rd!
+ glbp 4 weighting track 4 decrement 20
+ glbp 6 ipv6 FE80::DEF
+ glbp 6 priority 150
+ glbp 6 preempt
+ glbp 6 weighting 100 lower 90
+ glbp 6 authentication md5 key-string Passw0rd!
+ glbp 6 weighting track 6 decrement 20
+!
+router ospf 1
+ router-id 0.3.1.1
+ area 0 authentication message-digest
+ passive-interface default
+ no passive-interface TenGigabitEthernet1/0/48
+ no passive-interface Port-channel1
+!
+ip forward-protocol nd
+ip http server
+ip http authentication local
+ip http secure-server
+ip ftp username cisco
+ip ftp password cisco
+ip ssh version 2
+!
+!
+!
+ip sla 4
+ icmp-echo 10.0.200.1
+  frequency 10
+ip sla schedule 4 start-time now recurring
+ip sla 6
+ icmp-echo 2A14:7001:1111:1131::3
+  frequency 10
+ip sla schedule 6 start-time now recurring
+logging origin-id hostname
+logging host 10.0.10.2
+ipv6 router ospf 1
+ router-id 0.3.1.1
+ passive-interface default
+ no passive-interface TenGigabitEthernet1/0/48
+ no passive-interface Port-channel1
+!
+!
+!
+snmp-server group SNMPGROUP v3 priv 
+!
+!
+radius server WIN
+ address ipv4 10.0.10.1 auth-port 1812 acct-port 1813
+ key Passw0rd
+!
+!
+control-plane
+ service-policy input system-cpp-policy
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0 4
+ transport input ssh
+line vty 5 15
+!
+ntp server 136.92.3.1
+!
+!
+!
+!
+!
+!
+end

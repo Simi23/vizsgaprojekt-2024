@@ -1,0 +1,246 @@
+
+!
+! No configuration change since last restart
+! NVRAM config last updated at 14:05:43 CET Mon Mar 11 2024 by itadmin
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname STATION-ACC-2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+username localuser privilege 15 secret 5 $1$w5Qf$eJHzyUPfSWLpAsMcGussG.
+!
+!
+aaa new-model
+!
+!
+aaa authentication login default group radius local
+aaa authorization exec default group radius local 
+!
+!
+!
+aaa session-id common
+clock timezone CET 1
+clock summer-time CEST recurring last Sun Mar 2:00 last Sun Oct 3:00
+system mtu routing 1500
+!
+!
+ip dhcp snooping vlan 10
+no ip dhcp snooping information option
+ip dhcp snooping
+no ip domain-lookup
+ip domain-name mak.vasut
+ip arp inspection vlan 10
+ip arp inspection validate src-mac dst-mac ip 
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast default
+spanning-tree portfast bpduguard default
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+ip ftp username cisco
+ip ftp password cisco
+ip ssh version 2
+!
+!
+interface FastEthernet0/1
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/2
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/3
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/4
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/5
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/6
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/7
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/8
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/9
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/10
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/11
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/12
+ description **VLAN USERS**
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/13
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/14
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/15
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/16
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/17
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/18
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/19
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/20
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/21
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/22
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/23
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/24
+ description UNUSED
+ shutdown
+!
+interface GigabitEthernet0/1
+ description **UPLINK**
+ switchport trunk allowed vlan 10,199
+ switchport mode trunk
+ switchport nonegotiate
+ ip arp inspection trust
+ ip dhcp snooping trust
+!
+interface GigabitEthernet0/2
+ description UNUSED
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan199
+ ip address 10.101.199.2 255.255.255.0
+ ipv6 address 2A0B:FAC0:101:199::BBB2/64
+ ipv6 enable
+!
+ip default-gateway 10.101.199.254
+ip http server
+ip http secure-server
+logging origin-id hostname
+logging 10.0.10.2
+ipv6 route ::/0 Vlan199 FE80::DEF
+snmp-server group SNMPGROUP v3 priv 
+radius-server host 10.0.10.1 auth-port 1812 acct-port 1813 key Passw0rd
+vstack
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ transport input ssh
+line vty 5 15
+!
+ntp clock-period 36029418
+ntp server 136.92.3.1
+end

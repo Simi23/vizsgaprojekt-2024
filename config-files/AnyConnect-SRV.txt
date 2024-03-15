@@ -1,0 +1,305 @@
+: Saved
+
+: 
+: Serial Number: JAD250607ZH
+: Hardware:   ASA5506, 4096 MB RAM, CPU Atom C2000 series 1250 MHz, 1 CPU (4 cores)
+: Written by enable_15 at 13:23:00.779 UTC Mon Mar 11 2024
+!
+ASA Version 9.16(4) 
+!
+hostname AnyConnect-SRV
+domain-name mak.vasut
+enable password $sha512$5000$0c/7xq4qXcTWSh3vMj3UqQ==$0m3wwBk6+sSvevenC5UifA== pbkdf2
+service-module 1 keepalive-timeout 4
+service-module 1 keepalive-counter 6
+service-module sfr keepalive-timeout 4
+service-module sfr keepalive-counter 6
+names
+no mac-address auto
+ip local pool VPN_POOL 10.0.150.1-10.0.150.254 mask 255.255.255.0
+
+!
+interface GigabitEthernet1/1
+ nameif inside
+ security-level 100
+ ip address 10.0.20.1 255.255.255.0 
+ ipv6 address 2a14:7000:9999:9999::1/64
+ ipv6 enable
+!
+interface GigabitEthernet1/2
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet1/3
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet1/4
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet1/5
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet1/6
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet1/7
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface GigabitEthernet1/8
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface Management1/1
+ management-only
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+ftp mode passive
+dns server-group DefaultDNS
+ domain-name mak.vasut
+same-security-traffic permit inter-interface
+same-security-traffic permit intra-interface
+access-list SPLIT_TUNNEL standard permit 10.0.0.0 255.0.0.0 
+pager lines 24
+mtu inside 1500
+icmp unreachable rate-limit 1 burst-size 1
+no asdm history enable
+arp timeout 14400
+no arp permit-nonconnected
+arp rate-limit 16384
+ipv6 route inside ::/0 fe80::def
+route inside 0.0.0.0 0.0.0.0 10.0.20.254 1
+timeout xlate 3:00:00
+timeout pat-xlate 0:00:30
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 sctp 0:02:00 icmp 0:00:02
+timeout sunrpc 0:10:00 h323 0:05:00 h225 1:00:00 mgcp 0:05:00 mgcp-pat 0:05:00
+timeout sip 0:30:00 sip_media 0:02:00 sip-invite 0:03:00 sip-disconnect 0:02:00
+timeout sip-provisional-media 0:02:00 uauth 0:05:00 absolute
+timeout tcp-proxy-reassembly 0:01:00
+timeout floating-conn 0:00:00
+timeout conn-holddown 0:00:15
+timeout igp stale-route 0:01:10
+user-identity default-domain LOCAL
+aaa authentication login-history
+http server enable
+no snmp-server location
+no snmp-server contact
+service sw-reset-button
+crypto ipsec security-association pmtu-aging infinite
+crypto ca trustpoint MAK-CA
+ keypair MAK-CA
+ crl configure
+crypto ca trustpool policy
+crypto ca certificate chain MAK-CA
+ certificate ca 404088fa023a11147acaa7f917c9810a932f1ea3
+    3082056f 30820357 a0030201 02021440 4088fa02 3a11147a caa7f917 c9810a93 
+    2f1ea330 0d06092a 864886f7 0d01010b 05003047 310b3009 06035504 06130248 
+    55311730 15060355 040a0c0e 4d616b20 56617375 74205a72 742e311f 301d0603 
+    5504030c 164d616b 20566173 7574205a 72742e20 526f6f74 20434130 1e170d32 
+    34303232 39303835 3133395a 170d3334 30323236 30383531 33395a30 47310b30 
+    09060355 04061302 48553117 30150603 55040a0c 0e4d616b 20566173 7574205a 
+    72742e31 1f301d06 03550403 0c164d61 6b205661 73757420 5a72742e 20526f6f 
+    74204341 30820222 300d0609 2a864886 f70d0101 01050003 82020f00 3082020a 
+    02820201 00cd151b 4cc33d8b d3dddf37 3aeb81f5 c52a3ab8 e5149301 dd8643de 
+    1ffee860 088e4b2c 2fe1802c 880bb7b2 825349f7 a964ab65 9b771513 a7edde55 
+    f2c317da 8f5519f7 1eccb42f 3a8f5ef5 f33c1355 b8b609df 8c63bd41 4f9fd80a 
+    203cce8f f9cc0912 dd0a0fc7 d95cc3c9 9f49e6e4 7234aad5 c0d272fe d1227064 
+    bc0e978b d765ff0e 0b950d92 0d80092b 7fb5a2bb a1956c32 88d0cd79 3b0854cd 
+    55b9d698 e177745b a7cb33f1 838a553e 5a5431e0 a856a44e 5e20eae6 333f37c0 
+    a687cbc1 d402ab6a ea157c2a d3939e86 c2a90cf7 66f0fd07 ad2b9a05 f3318d69 
+    780f185e 2b3b9276 63efc617 3a86be6b 66bc486a 549bb82b 0a34f11d 1598c84b 
+    a786ddc1 2bdb69e9 4a9700c2 b630dca8 ad4f3b10 23c2422f e953c7b9 6564f65c 
+    1bb72486 e1e82ee2 b88c24cc fbb51dec 5897a091 0ba7e816 91f40c1f c552649f 
+    46a64105 889277a9 61473607 c15191f2 7be3ef90 61ef4548 b8fdf666 eebcfcd4 
+    4d69661f 5fe80ffb 03ea67ea f70b66a4 44a17470 d9365960 f6b547bc 12dcb4c6 
+    e9ab060c 8423a33e e659efa1 27fd47e7 00d241a7 04f338b8 039c7eb8 2cf0d26f 
+    1c3b503c ffb337c1 ab72cf6c 1a094d6c deb1bfa2 a536473c f60f092f 547c715e 
+    261892a6 afa2b862 766c67df 668931bb 500a62b1 8461582e 2bae50d0 6a26e3fe 
+    21e0e452 a0b66d05 d3d451aa 7b6e3c04 0ce41ef9 ae75e95c 4ada6258 889629eb 
+    689105c5 31020301 0001a353 3051301d 0603551d 0e041604 142ce703 682120f7 
+    601c7456 93b428b2 fe25a9cf 4c301f06 03551d23 04183016 80142ce7 03682120 
+    f7601c74 5693b428 b2fe25a9 cf4c300f 0603551d 130101ff 04053003 0101ff30 
+    0d06092a 864886f7 0d01010b 05000382 02010039 65123af0 d59d08cd afd8a627 
+    3204327a 08a82bfa dc3d1a14 5d01b350 9756a2f6 8d16d85e 37b98c4d 376d407c 
+    d24e8d28 81b18e0d 3be97956 b5d501be c4abe8d0 9ddc6503 bd84d8f1 eba14aa4 
+    ad41c99e 2d1b91a7 d59df7db d40b1e52 62f02bc5 b815038f 2b80df03 4c83ca02 
+    9aedea8b 759d044a eab9ec0d 33ea1f1e 011f26a1 f4e7b0f3 e5745441 3bbc9a65 
+    463662aa e2c756c1 90cc66b9 21da9cea aa98c8b2 93ff0cf0 e4a7a5a7 11bacd49 
+    9daee09e 9409dadb 017e0b65 7e6e09fb 81b07e49 82c370f9 9eec1db5 13260944 
+    b203bb4d 3c435d52 b84f8203 f8f35879 e56f895f ba4218e8 8d8f043b 09099d97 
+    8427edfe e9bde654 9720d902 a79e3538 696f2614 d20c9676 c5d5cb3d 0aa9a574 
+    c581eaab 8937ca02 c63d78be ecd0d0b4 ecd4cf8c 844c1fe8 2f917b23 62bf3077 
+    db993e8f a1a72ce9 d3474a9c 2bf6841d 241f644e 8f1e9155 85bd2fdf 78a39728 
+    58e0ec2b 6b056f0f 0d73da95 f30a4580 2067b3ca 561f092a eec8e140 e90fd7b7 
+    35897f5d d57ca64b 8520d516 ef35fff2 3b79c668 174e2314 9a2de6c7 5a9e7ed7 
+    c656c594 bdb70574 578d0fe1 58c25844 597b1dfd eed7fc3e f5e3ac65 5d11893a 
+    f7b1f883 47c5ab71 f14e84c4 c37cbc14 254cae4c 4d2049b1 3b37de6c a8b49816 
+    cc754532 24ee82b2 ec0bd433 596f46d6 d8c84d5e a3e2c529 6bcb97a2 e8c767b9 
+    3ecd7ce0 05415dfb 6cad7ffa 3e2dd279 8d3889
+  quit
+ certificate 16073de8571b8d6681282c78aa8c151748dffa82
+    3082059b 30820383 a0030201 02021416 073de857 1b8d6681 282c78aa 8c151748 
+    dffa8230 0d06092a 864886f7 0d01010b 05003047 310b3009 06035504 06130248 
+    55311730 15060355 040a0c0e 4d616b20 56617375 74205a72 742e311f 301d0603 
+    5504030c 164d616b 20566173 7574205a 72742e20 526f6f74 20434130 1e170d32 
+    34303330 36313731 3534325a 170d3236 30323234 31373135 34325a30 49310b30 
+    09060355 04061302 48553117 30150603 55040a0c 0e4d616b 20566173 7574205a 
+    72742e31 21301f06 03550403 0c18416e 79436f6e 6e656374 2d535256 2e6d616b 
+    2e766173 75743082 0222300d 06092a86 4886f70d 01010105 00038202 0f003082 
+    020a0282 020100dc 557aaf67 9528a71b f1557e6a e47c45ee ef64fb79 61afca63 
+    80b1add3 a613f2e9 5de00985 72e877b6 ec9fd103 bf7e6e1a fee83949 95a12ecb 
+    d4cca1ab a5ce1a54 b82a0d2a 73e594d8 e54fb80e 55d8f3c2 2409530b b56a700e 
+    7cdf96a4 fcb99ff7 241dfdad 2dd4b6b0 9afb8aea f1fa8f86 ad93206f 3f2554b9 
+    ac78552f a15c8ab7 248ec917 7864d55e c37190fc a4adbbb7 2d704827 3b14d2fa 
+    db95a806 e52cc233 7a895013 7432264e 48879e41 8b4c09c8 a974770a a7bf530d 
+    3b6e0611 ce6927a1 5f6bcae9 7c6029ed 96b34341 dcdce387 535e1499 7d7c683e 
+    51935772 8a6c3492 7d220ae5 ef7937fc 0eabc1fa b7dfa33f 340f5814 de09e09d 
+    f1f879a9 27b5c1d1 e2924c10 2afbcacb 13d5ef8a 0f3fee1c b39be3b9 f0f9979a 
+    8455e20f cd5d4b93 dd310df3 ee08232f 78f3ada9 7f8fa3fa a12c2190 497dac3b 
+    7bdfacd0 4d6ed0ea 00f523b9 09d6564e 9d1c854d ef302b6d 478e5593 d0d9e11f 
+    8a16ae6e 2ace5ce5 248b531e f88c0569 f5360cb0 c3104bbf 7cc4336b 75f6b633 
+    0203464a 1b3d0cd8 489ed443 85112148 4a9f2271 669e9960 fea0295a 5fb218cb 
+    e7ff9f18 873048ce b9d37e1d 941a468e cd0bba56 383ec122 bf1e92c2 ed17044f 
+    7a27885b c8636fa0 69747782 1d8a4ebb 33dd90a1 19204ac5 1b89c78b 2777ed27 
+    fd693c04 3cf518a0 c6473721 ada94004 8871ba7b 5a220909 51b845f2 4185be45 
+    ea1fd580 c86e8902 03010001 a37d307b 301f0603 551d2304 18301680 142ce703 
+    682120f7 601c7456 93b428b2 fe25a9cf 4c300906 03551d13 04023000 300b0603 
+    551d0f04 04030204 f0302106 03551d11 041a3018 87045409 17018210 76706e2e 
+    6d616b2d 76617375 742e6875 301d0603 551d0e04 16041467 a2d0d493 616f933c 
+    ad66a155 04f73adb 3eea2030 0d06092a 864886f7 0d01010b 05000382 02010059 
+    14f71a02 cbe95905 0b765653 7d9b1f69 0af2553d 171bc9f7 fb4c6661 312350d9 
+    b5eb30ec 684ace7e 923d0b68 a50e4e02 bb94bc0d d2b4f1df ad731364 6442e85e 
+    44387760 c23a27f2 781d3e3b 0741120a 1b422d60 31a61103 6c7bea6d e44b38aa 
+    6f00346b de7b296a 837126ee 25af70fb c585264c 5e2cfb93 70b38cd0 2c23701a 
+    037bf23a 4fb91eb4 f7a7ce2c a017864e 08538e00 c683b7a0 0135cd39 698a90b9 
+    da3f4eda d4d598a5 6869495a 1d8b5346 c88df3c9 c35cfb7d 4d3bfb95 e9814f83 
+    355c3bd0 1dda8467 c8b4018b 226655af 8c344518 7da291fd 54145ba9 ea1c2b65 
+    55fc6be8 f783f527 47ec60c1 edf9a452 b550c0c6 54c334ac f16223d1 6172bec7 
+    c4aeed1b 3f3de451 e1c6e1f1 3e2062bf 413c3108 64befba1 9432d2e2 f67b4096 
+    5cd56f35 7ed3d273 f51fa254 fe9a828d 1994c427 77f02db3 f221b114 8b6fe1d3 
+    c378e820 c99ebb98 2cd97720 834be1a1 ab4df22e 5973c437 cc895378 e6434b02 
+    13419b58 74e44dcd 443638e3 134291be 8cd51b86 8f60cc2e d7c1a4c1 ded5aa61 
+    02e9cf8b ccd8cdd0 60a2ed32 f93653a3 ed9ef094 f9c549f0 46e5b712 ca486835 
+    c8ff348e 7d7b0769 84f916b0 b1fd0668 edfffa1a 739eb1ed 5472d473 b140b470 
+    69792cfb 183c2d14 350763a0 810e5e9e e281870e 7cf4ff93 14ec19bb a55b21e5 
+    2c652dc7 2499fb0e a718013e cd301d92 dd729f0d ec73e2f8 6a47ddd4 475aa4
+  quit
+telnet timeout 5
+ssh stricthostkeycheck
+ssh timeout 5
+ssh version 2
+ssh key-exchange group dh-group14-sha256
+console timeout 0
+
+threat-detection basic-threat
+threat-detection statistics access-list
+no threat-detection statistics tcp-intercept
+ssl trust-point MAK-CA inside
+webvpn
+ enable inside
+ http-headers
+  hsts-server
+   enable
+   max-age 31536000
+   include-sub-domains
+   no preload
+  hsts-client
+   enable
+  x-content-type-options
+  x-xss-protection
+  content-security-policy
+ anyconnect image disk0:/anyconnect.pkg 1
+ anyconnect enable
+ tunnel-group-list enable
+ cache
+  disable
+ error-recovery disable
+group-policy GP internal
+group-policy GP attributes
+ dns-server value 10.0.10.1
+ vpn-tunnel-protocol ssl-client 
+ split-tunnel-policy tunnelspecified
+ split-tunnel-network-list value SPLIT_TUNNEL
+ address-pools value VPN_POOL
+dynamic-access-policy-record DfltAccessPolicy
+username vpnuser password $sha512$5000$l5p+mYn2juXBpoI2hq/mdQ==$VXjA98PVZrAGAILtLeuYgg== pbkdf2 privilege 1
+tunnel-group TG type remote-access
+tunnel-group TG general-attributes
+ default-group-policy GP
+ dhcp-server 10.0.10.1
+tunnel-group TG webvpn-attributes
+ group-alias LOCAL-AUTH enable
+!
+class-map inspection_default
+ match default-inspection-traffic
+!
+!
+policy-map type inspect dns preset_dns_map
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+policy-map global_policy
+ class inspection_default
+  inspect ftp 
+  inspect h323 h225 
+  inspect h323 ras 
+  inspect ip-options 
+  inspect netbios 
+  inspect rsh 
+  inspect rtsp 
+  inspect skinny 
+  inspect esmtp 
+  inspect sqlnet 
+  inspect sunrpc 
+  inspect tftp 
+  inspect sip  
+  inspect dns preset_dns_map 
+policy-map type inspect dns migrated_dns_map_2
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+policy-map type inspect dns migrated_dns_map_1
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+!
+service-policy global_policy global
+prompt hostname context 
+no call-home reporting anonymous
+call-home
+ profile CiscoTAC-1
+  no active
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination address email callhome@cisco.com
+  destination transport-method http
+  subscribe-to-alert-group diagnostic
+  subscribe-to-alert-group environment
+  subscribe-to-alert-group inventory periodic monthly
+  subscribe-to-alert-group configuration periodic monthly
+  subscribe-to-alert-group telemetry periodic daily
+Cryptochecksum:94b4512b32e9088138ab88f54ac1416c
+: end

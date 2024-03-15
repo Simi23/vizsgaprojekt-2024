@@ -1,0 +1,275 @@
+Using 5794 out of 65536 bytes
+!
+! Last configuration change at 00:37:31 UTC Mon Mar 1 1993
+! NVRAM config last updated at 13:13:22 UTC Mon Mar 11 2024
+!
+version 15.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname OFFICE-ACC-1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+username localuser privilege 15 secret 9 $9$gEi5ctafEwcC.q$cfCjlHi79hFPkdiqrJQPZPF7VoLP.m8.MzkbzIACFPg
+no aaa new-model
+system mtu routing 1500
+!
+!
+!         
+!
+!
+!
+!
+!
+!
+ip arp inspection vlan 110,120,130,199
+ip arp inspection validate src-mac dst-mac ip 
+!
+!
+ip dhcp snooping vlan 110,120,130,199
+no ip dhcp snooping information option
+ip dhcp snooping
+no ip domain-lookup
+ip domain-name mak.vasut
+!
+crypto pki trustpoint TP-self-signed-634202240
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-634202240
+ revocation-check none
+ rsakeypair TP-self-signed-634202240
+!
+!         
+crypto pki certificate chain TP-self-signed-634202240
+ certificate self-signed 01 nvram:IOS-Self-Sig#2B.cer
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast edge default
+spanning-tree portfast edge bpduguard default
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/1
+ description Marketing
+ switchport access vlan 110
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!         
+interface FastEthernet0/2
+ description Marketing
+ switchport access vlan 110
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/3
+ description Marketing
+ switchport access vlan 110
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/4
+ description Marketing
+ switchport access vlan 110
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/5
+ description Marketing
+ switchport access vlan 110
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/6
+ description Marketing
+ switchport access vlan 110
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/7
+ description Accounting
+ switchport access vlan 120
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/8
+ description Accounting
+ switchport access vlan 120
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/9
+ description Accounting
+ switchport access vlan 120
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/10
+ description Accounting
+ switchport access vlan 120
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/11
+ description Accounting
+ switchport access vlan 120
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/12
+ description Accounting
+ switchport access vlan 120
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/13
+ description HR
+ switchport access vlan 130
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/14
+ description HR
+ switchport access vlan 130
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/15
+ description HR
+ switchport access vlan 130
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/16
+ description HR
+ switchport access vlan 130
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/17
+ description HR
+ switchport access vlan 130
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/18
+ description HR
+ switchport access vlan 130
+ switchport mode access
+ switchport nonegotiate
+ ip arp inspection limit rate 4
+ ip dhcp snooping limit rate 4
+!
+interface FastEthernet0/19
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/20
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/21
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/22
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/23
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/24
+ description UNUSED
+ shutdown
+!
+interface GigabitEthernet0/1
+ description **UPLINK**
+ switchport trunk allowed vlan 110,120,130,199
+ switchport mode trunk
+ switchport nonegotiate
+ ip arp inspection trust
+ ip dhcp snooping trust
+!
+interface GigabitEthernet0/2
+ description **UPLINK**
+ switchport trunk allowed vlan 110,120,130,199
+ switchport mode trunk
+ switchport nonegotiate
+ ip arp inspection trust
+ ip dhcp snooping trust
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan199
+ ip address 10.1.199.221 255.255.255.0
+ ipv6 address 2A09:F8C0:1:199::1/64
+!         
+ip default-gateway 10.1.199.254
+ip http server
+ip http secure-server
+ip ftp username cisco
+ip ftp password cisco
+ip ssh version 2
+!
+!
+!
+line con 0
+ logging synchronous
+line vty 0 4
+ login
+ length 0
+ transport input ssh
+line vty 5 15
+ login
+ length 0
+ transport input ssh
+!
+ntp server 136.92.3.1
+end

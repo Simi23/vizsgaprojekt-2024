@@ -1,0 +1,326 @@
+
+!
+! Last configuration change at 10:46:35 CET Mon Mar 11 2024 by localuser
+! NVRAM config last updated at 14:08:07 CET Mon Mar 11 2024 by localuser
+!
+version 17.9
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service call-home
+platform qfp utilization monitor load 80
+platform punt-keepalive disable-kernel-core
+!
+hostname STATION
+!
+boot-start-marker
+boot-end-marker
+!
+!
+aaa new-model
+!
+!
+aaa group server radius WIN-RAD
+ server name WIN
+!
+aaa authentication login default group WIN-RAD local
+aaa authorization exec default group WIN-RAD local 
+!
+!
+aaa session-id common
+clock timezone CET 1 0
+clock summer-time CEST recurring last Sun Mar 2:00 last Sun Oct 3:00
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip domain name mak.vasut
+!
+!
+!
+login on-success log
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+! 
+! 
+! 
+! 
+vtp version 1
+!
+multilink bundle-name authenticated
+!
+!
+!
+crypto pki trustpoint TP-self-signed-3145804853
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3145804853
+ revocation-check none
+ rsakeypair TP-self-signed-3145804853
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+crypto pki trustpoint MAK-CA
+ enrollment pkcs12
+ revocation-check none
+ rsakeypair MAK-CA
+!
+!
+!
+crypto pki certificate map MAK-CMAP 1
+ issuer-name co mak vasut zrt. root ca
+!
+crypto pki certificate chain TP-self-signed-3145804853
+ certificate self-signed 01 nvram:IOS-Self-Sig#38.cer
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01 nvram:CiscoLicensi#1CA.cer
+crypto pki certificate chain MAK-CA
+ certificate 16073DE8571B8D6681282C78AA8C151748DFFA7D nvram:MakVasutZrtR#FA7D.cer
+ certificate ca 404088FA023A11147ACAA7F917C9810A932F1EA3 nvram:MakVasutZrtR#1EA3CA.cer
+!
+!
+no license feature hseck9
+license udi pid ISR4221/K9 sn FGL2504L2LC
+memory free low-watermark processor 63130
+!
+diagnostic bootup level minimal
+!
+spanning-tree extend system-id
+!
+!
+enable secret 9 $9$OWd3WGGz7qU3TE$k61jz9A3IiTPbM/Xux03cA9WzcKo6gjDKM/CwLBJ7dQ
+!
+username localuser privilege 15 secret 9 $9$LHfSHpiQojJhs.$taVEjx.QfdvKvoIUbWLZB.yO9oAs2TXwKgs7ZkOwnrw
+!
+redundancy
+ mode none
+!
+crypto ikev2 proposal MAK-IKE-PROP 
+ encryption aes-cbc-256
+ integrity sha512
+ group 24
+!
+crypto ikev2 policy MAK-IKE-POLICY 
+ proposal MAK-IKE-PROP
+!
+!
+crypto ikev2 profile MAK-IKE-PROF
+ match certificate MAK-CMAP
+ authentication remote rsa-sig
+ authentication local rsa-sig
+ pki trustpoint MAK-CA
+!
+no crypto ikev2 http-url cert
+!
+!
+!
+!
+class-map type inspect match-any FROM-ANY
+ match access-group name ANY
+!
+policy-map type inspect FROM-ANY
+ class type inspect FROM-ANY
+  inspect
+ class class-default
+!
+zone security INSIDE
+zone security OUTSIDE
+zone security PUBLIC
+zone-pair security LAN-WAN source INSIDE destination OUTSIDE
+ description Traffic from LAN to WAN
+ service-policy type inspect FROM-ANY
+zone-pair security PUBLIC-WAN source PUBLIC destination OUTSIDE
+ description Traffic from PUBLIC to WAN
+ service-policy type inspect FROM-ANY
+zone-pair security WAN-SELF source OUTSIDE destination self
+ service-policy type inspect FROM-ANY
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+crypto ipsec transform-set MAK-TSET esp-aes 256 esp-sha512-hmac 
+ mode tunnel
+!
+crypto ipsec profile MAK-IPSEC-PROF
+ set transform-set MAK-TSET 
+ set ikev2-profile MAK-IKE-PROF
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+!
+interface Loopback0
+ ip address 32.15.33.89 255.255.255.255
+!
+interface Tunnel1
+ ip address 192.168.1.21 255.255.255.0
+ no ip redirects
+ ip nhrp authentication Passw0rd
+ ip nhrp map multicast 84.9.23.3
+ ip nhrp network-id 1
+ ip nhrp nhs 192.168.1.1 nbma 84.9.23.3
+ ip ospf message-digest-key 1 md5 Passw0rd!
+ ip ospf network point-to-multipoint
+ ip ospf 1 area 100
+ tunnel source Serial0/1/0
+ tunnel mode gre multipoint
+ tunnel key 1
+ tunnel protection ipsec profile MAK-IPSEC-PROF shared
+!
+interface Tunnel2
+ ip address 192.168.2.21 255.255.255.0
+ no ip redirects
+ ip nhrp authentication Passw0rd
+ ip nhrp map multicast 84.9.23.4
+ ip nhrp network-id 2
+ ip nhrp nhs 192.168.2.2 nbma 84.9.23.4
+ ip ospf message-digest-key 1 md5 Passw0rd!
+ ip ospf network point-to-multipoint
+ ip ospf 1 area 100
+ tunnel source Serial0/1/0
+ tunnel mode gre multipoint
+ tunnel key 2
+ tunnel protection ipsec profile MAK-IPSEC-PROF shared
+!
+interface GigabitEthernet0/0/0
+ description **STATION-DIST**
+ ip address 10.101.200.1 255.255.255.252
+ ip nat inside
+ ip ospf message-digest-key 1 md5 Passw0rd!
+ ip ospf 1 area 100
+ negotiation auto
+ ipv6 enable
+ ipv6 ospf 1 area 100
+!
+interface GigabitEthernet0/0/1
+ description **STATION-PUBLIC**
+ ip address 10.201.200.1 255.255.255.252
+ ip nat inside
+ ip ospf message-digest-key 1 md5 Passw0rd!
+ ip ospf 1 area 100
+ negotiation auto
+ ipv6 enable
+ ipv6 ospf 1 area 100
+!
+interface Serial0/1/0
+ description **WAN**
+ ip address 84.225.32.2 255.255.255.252
+ ip nat outside
+ ipv6 address 2001:B1B1:EECC:1021::2/64
+ ipv6 enable
+!
+interface Serial0/1/1
+ no ip address
+ shutdown
+!
+router ospf 1
+ router-id 2.1.1.1
+ area 100 authentication message-digest
+ default-information originate
+!
+router bgp 65300
+ bgp log-neighbor-changes
+ neighbor 84.225.32.1 remote-as 65000
+ !
+ address-family ipv4
+  network 32.15.33.89 mask 255.255.255.255
+  neighbor 84.225.32.1 activate
+ exit-address-family
+ !
+ address-family ipv6
+  network 2A0B:FAC0::/32
+  network 2A10:ECC0::/32
+  neighbor 84.225.32.1 activate
+  neighbor 84.225.32.1 route-map IPV6_NEXT_HOP in
+ exit-address-family
+!
+ip http server
+ip http authentication local
+ip http secure-server
+ip forward-protocol nd
+ip ftp username cisco
+ip ftp password cisco
+ip nat inside source list NAT interface Serial0/1/0 overload
+ip route 0.0.0.0 0.0.0.0 84.225.32.1 240
+ip ssh version 2
+!
+!
+ip access-list standard ANY
+ 10 permit any
+ip access-list standard NAT
+ 10 permit 10.0.0.0 0.255.255.255
+!
+!
+logging origin-id hostname
+logging host 10.0.10.2
+ipv6 route 2A0B:FAC0::/32 Null0
+ipv6 route 2A10:ECC0::/32 Null0
+ipv6 route ::/0 Serial0/1/0 2001:B1B1:EECC:1021::1 240
+ipv6 router ospf 1
+ router-id 2.1.1.1
+ default-information originate
+!
+!
+route-map IPV6_NEXT_HOP permit 10 
+ set ipv6 next-hop 2001:B1B1:EECC:1021::1
+!
+snmp-server group SNMPGROUP v3 priv 
+!
+!
+!
+radius server WIN
+ address ipv4 10.0.10.1 auth-port 1812 acct-port 1813
+ key Passw0rd
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ transport input none
+ stopbits 1
+line aux 0
+line vty 0 4
+ transport input ssh
+line vty 5 14
+ transport input ssh
+!
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+ntp server 136.92.3.1
+!
+!
+!
+!
+!
+!
+end

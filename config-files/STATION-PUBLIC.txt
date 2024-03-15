@@ -1,0 +1,204 @@
+
+!
+! Last configuration change at 08:43:13 CET Mon Mar 11 2024
+! NVRAM config last updated at 14:08:42 CET Mon Mar 11 2024 by itadmin
+!
+version 17.9
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service call-home
+platform qfp utilization monitor load 80
+platform punt-keepalive disable-kernel-core
+!
+hostname STATION-PUBLIC
+!
+boot-start-marker
+boot-end-marker
+!
+!
+aaa new-model
+!
+!
+aaa group server radius WIN-RAD
+ server name WIN
+!
+aaa authentication login default group WIN-RAD local
+aaa authorization exec default group WIN-RAD local 
+!
+!
+aaa session-id common
+clock timezone CET 1 0
+clock summer-time CEST recurring last Sun Mar 2:00 last Sun Oct 3:00
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip domain name mak.vasut
+ip dhcp excluded-address 10.201.3.245 10.201.3.254
+!
+ip dhcp pool GUESTS
+ network 10.201.0.0 255.255.252.0
+ default-router 10.201.3.254 
+ dns-server 8.8.8.8 
+!
+!
+!
+login on-success log
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+! 
+! 
+! 
+! 
+vtp version 1
+!
+multilink bundle-name authenticated
+!
+!
+!
+crypto pki trustpoint TP-self-signed-617949599
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-617949599
+ revocation-check none
+ rsakeypair TP-self-signed-617949599
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+!
+crypto pki certificate chain TP-self-signed-617949599
+ certificate self-signed 01 nvram:IOS-Self-Sig#32.cer
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01 nvram:CiscoLicensi#1CA.cer
+!
+!
+no license feature hseck9
+license udi pid ISR4221/K9 sn FGL2504L2M7
+memory free low-watermark processor 63130
+!
+diagnostic bootup level minimal
+!
+spanning-tree extend system-id
+!
+!
+enable secret 9 $9$5FXHtjEku..ngE$447q7VHUWPPwy3JVS8ZceRdQ6lCCP2JEluVPoF/SkRY
+!
+username localuser privilege 15 secret 9 $9$XPqQYQnxoNJKA.$TtZBP5p5LjKN.mqEj41IdG7V0/Kw/ckz6lzDHlPTpAU
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+!
+interface GigabitEthernet0/0/0
+ description **STATION**
+ ip address 10.201.200.2 255.255.255.252
+ ip ospf message-digest-key 1 md5 Passw0rd!
+ ip ospf 1 area 100
+ negotiation auto
+ ipv6 enable
+ ipv6 ospf 1 area 100
+!
+interface GigabitEthernet0/0/1
+ description **LAN**
+ ip address 10.201.3.254 255.255.252.0
+ ip ospf 1 area 100
+ negotiation auto
+ ipv6 address 2A10:ECC0:201::DEF/64
+ ipv6 enable
+ ipv6 ospf 1 area 100
+!
+router ospf 1
+ router-id 2.2.2.2
+ area 100 authentication message-digest
+ passive-interface GigabitEthernet0/0/1
+!
+ip http server
+ip http authentication local
+ip http secure-server
+ip forward-protocol nd
+ip ftp username cisco
+ip ftp password cisco
+ip ssh version 2
+!
+!
+!
+logging origin-id hostname
+logging host 10.0.10.2
+ipv6 router ospf 1
+ router-id 2.2.2.2
+ passive-interface GigabitEthernet0/0/1
+!
+!
+snmp-server group SNMPGROUP v3 priv 
+!
+!
+!
+radius server WIN
+ address ipv4 10.0.10.1 auth-port 1812 acct-port 1813
+ key Passw0rd
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ transport input none
+ stopbits 1
+line aux 0
+line vty 0 4
+ transport input ssh
+line vty 5 14
+ transport input ssh
+!
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+ntp server 136.92.3.1
+!
+!
+!
+!
+!
+!
+end

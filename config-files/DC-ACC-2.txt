@@ -1,0 +1,222 @@
+
+!
+! Last configuration change at 01:00:55 CET Mon Mar 1 1993
+! NVRAM config last updated at 14:03:56 CET Mon Mar 11 2024 by itadmin
+!
+version 15.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname DC-ACC-2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+username localuser privilege 15 secret 9 $9$NOsxXoptnq7hcY$ja2ItL3kqI3MTAajI1xdZxXLLXN0WO.imr6/Vd5xupc
+aaa new-model
+!
+!
+aaa group server radius WIN-RAD
+ server name WIN
+!
+aaa authentication login default group WIN-RAD local
+aaa authorization exec default group WIN-RAD local 
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone CET 1 0
+clock summer-time CEST recurring last Sun Mar 2:00 last Sun Oct 3:00
+system mtu routing 1500
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no ip domain-lookup
+ip domain-name mak.vasut
+!
+crypto pki trustpoint TP-self-signed-323516032
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-323516032
+ revocation-check none
+ rsakeypair TP-self-signed-323516032
+!
+!
+crypto pki certificate chain TP-self-signed-323516032
+ certificate self-signed 01 nvram:IOS-Self-Sig#B.cer
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast edge default
+spanning-tree portfast edge bpduguard default
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/1
+ description **ASA**
+ switchport access vlan 20
+ switchport mode access
+ switchport nonegotiate
+!
+interface FastEthernet0/2
+ description **ASA**
+ switchport access vlan 20
+ switchport mode access
+ switchport nonegotiate
+!
+interface FastEthernet0/3
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/4
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/5
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/6
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/7
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/8
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/9
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/10
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/11
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/12
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/13
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/14
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/15
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/16
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/17
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/18
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/19
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/20
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/21
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/22
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/23
+ description UNUSED
+ shutdown
+!
+interface FastEthernet0/24
+ description UNUSED
+ shutdown
+!
+interface GigabitEthernet0/1
+ description **UPLINK**
+ switchport trunk allowed vlan 20,199
+ switchport mode trunk
+ switchport nonegotiate
+!
+interface GigabitEthernet0/2
+ description **UPLINK**
+ switchport trunk allowed vlan 20,199
+ switchport mode trunk
+ switchport nonegotiate
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan199
+ ip address 10.0.199.2 255.255.255.0
+ ipv6 address 2A14:7000:0:199::2/64
+ ipv6 enable
+!
+ip default-gateway 10.0.199.254
+ip http server
+ip http secure-server
+ip ftp username cisco
+ip ftp password cisco
+ip ssh version 2
+!
+logging origin-id hostname
+logging host 10.0.10.2
+ipv6 route ::/0 Vlan199 FE80::DEF
+!
+snmp-server group SNMPGROUP v3 priv 
+!
+radius server WIN
+ address ipv4 10.0.10.1 auth-port 1645 acct-port 1646
+ key Passw0rd
+!
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+line vty 0 4
+ transport input ssh
+line vty 5 15
+ transport input ssh
+!
+ntp server 136.92.3.1
+end
